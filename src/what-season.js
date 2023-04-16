@@ -15,12 +15,26 @@ function getSeason(date) {
   if (arguments.length === 0) {
     return 'Unable to determine the time of year!'
   }
-  if (isNaN(new Date(date))) {
+
+  if (!(date instanceof Date) || isNaN(date.getTime())) {
     throw new Error('Invalid date!')
   }
 
-  if ((date instanceof Date) == true) {
-  
+  try {
+    date.toISOString()
+  } catch (error) {
+    throw new Error('Invalid date!')
+  }
+
+  if (Object.prototype.toString.call(date) !== '[object Date]') {
+    throw new Error('Invalid date!')
+  }
+
+  const copiedDate = new Date(date.getTime())
+  if (date.toString() !== copiedDate.toString()) {
+    throw new Error('Invalid date!')
+  }
+
   const month = date.getMonth()
   if (month === 11 || month === 0 || month === 1) {
     return 'winter'
@@ -31,7 +45,6 @@ function getSeason(date) {
   } else {
     return 'autumn'
   }
-}
 }
 
 module.exports = {
