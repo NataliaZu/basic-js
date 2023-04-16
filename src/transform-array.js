@@ -17,39 +17,37 @@ function transform(arr) {
   if (!Array.isArray(arr)) {
     throw new Error("'arr' parameter must be an instance of the Array!")
   }
+  const result = []
+  const skipIndices = new Set()
+  for (let i = 0; i < arr.length; i++) {
+    const currElement = arr[i]
+    const nextElement = arr[i + 1]
+    const prevElement = arr[i - 1]
 
-  return arr.reduce((result, current, index) => {
-    if (current === "--discard-next") {
-      return result
+    if (skipIndices.has(i)) {
+      continue
     }
 
-    if (current === "--discard-prev") {
-      if (index > 0 && arr[index - 2] !== "--discard-next") {
+    if (currElement === '--discard-next') {
+      skipIndices.add(i + 1)
+    } else if (currElement === '--discard-prev') {
+      if (!skipIndices.has(i - 1)) {
         result.pop()
       }
-      return result
-    }
-
-    if (current === "--double-next") {
-      if (index < arr.length - 1) {
-        result.push(arr[index + 1])
+    } else if (currElement === '--double-next') {
+      if (nextElement !== undefined) {
+        result.push(nextElement)
       }
-      return result
-    }
-
-    if (current === "--double-prev") {
-      if (index > 0 && arr[index - 2] !== "--discard-next") {
-        result.push(arr[index - 1])
+    } else if (currElement === '--double-prev') {
+      if (prevElement !== undefined && !skipIndices.has(i - 1)) {
+        result.push(result[result.length - 1])
       }
-      return result
+    } else {
+      result.push(currElement)
     }
-
-    result.push(current)
-    return result
-  }, [])
+  }
+  return result
 }
-
-console.log(transform([1, 2, 3, '--discard-prev', 4, 5]))
 
 module.exports = {
   transform
