@@ -41,8 +41,6 @@ function encodeLine(str) {
   return result
 }
 
-console.log(encodeLine(''))
-
 module.exports = {
   encodeLine
 };
